@@ -9,7 +9,7 @@ Focus: 实现基于 Fraq 的群聊斗地主人机 MVP，并保持牌局状态、
 
 ## Next
 
-先处理 `my-fraq-app` 的旧版 Fraq CLI/Fraq 核心兼容性并在 `fraq.yml` 启用 `doudizhu`，再验证群聊指令和图片发送；随后在真实 GitHub 仓库验证已项目化的 `.github` 工作流，并根据真实对局反馈扩展牌型、AI 和真人 PK。
+先取得 Actions 运行 `34321214614` 的失败步骤日志；本地质量检查已通过，且 npm 已存在 `0.1.0`，若为发布冲突则递增版本并创建新标签。之后处理 `my-fraq-app` 的旧版 Fraq CLI/Fraq 核心兼容性、启用 `doudizhu` 并验证群聊指令和图片发送。
 
 ## Open questions
 
