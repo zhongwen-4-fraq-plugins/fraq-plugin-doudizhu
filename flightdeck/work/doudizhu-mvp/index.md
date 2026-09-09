@@ -11,12 +11,14 @@
 - 操作超时会结束牌局、释放房间并向群发送通知；连续三轮无人叫地主后随机选地主。
 - `.github` 的 Issue 模板、发布脚本和 GitHub Actions 工作流已完成斗地主项目化适配，包含项目名称、仓库链接、npm 包名、检查命令和发布 User-Agent。
 - 已创建并推送 `v0.1.0`，并将本地包链接安装到 `D:\bot\fraq-plugins\my-fraq-app`。
+- 已在 `D:\bot\fraq-plugins\my-fraq-app` 复核 `pnpm add D:\bot\fraq-plugin-doudizhu`，依赖保持本地 junction，`dist/index.mjs` 入口存在。
+- 目标 `fraq.yml` 尚未配置 `doudizhu` 插件；目标工作区当前使用 `@fraqjs/fraq 0.17.0`，低于本插件要求的 `^1.1.0`，真实启动前需先处理兼容性。
 
 ## Next
 
 - 用 Fraq 工作区插件连接真实协议端，验证中文路由、图片发送和群聊权限。
 - 在真实 GitHub 仓库中验证 PR 审核和 npm 发布工作流。
-- 在 `my-fraq-app` 中核对旧版 Fraq CLI `0.7.0` 与本插件 `@fraqjs/fraq ^1.1.0` 的兼容性，再验证群聊指令和图片发送。
+- 在 `my-fraq-app` 中升级或确认兼容的 Fraq CLI/Fraq 核心，配置 `doudizhu: {}` 后再验证群聊指令和图片发送。
 - 根据实际牌局反馈完善飞机带翅膀、机器人策略和真人 PK 扩展接口。
 
 ## Open questions
@@ -31,5 +33,6 @@
 ## Read if
 
 - 修改 Fraq 插件生命周期、路由或发布配置时，读取 `flightdeck/knowledge/fraq/plugin.md`。
+- 本地链接插件安装后无法加载或指令无响应时，读取 `flightdeck/knowledge/fraq/local-plugin-install.md`。
 - 修改牌面拼接尺寸、发送格式或图片缓存时，读取 `flightdeck/knowledge/doudizhu/image-layout.md`。
 - 复制或调整 `.github` 工作流和 Issue 模板时，读取 `flightdeck/knowledge/fraq/github-workflows.md`。
