@@ -1,6 +1,6 @@
 name: 请求帮助
-description: 获取词库插件使用或配置方面的帮助
-title: '[Help] '
+description: 获取斗地主插件使用或配置方面的帮助
+title: '[帮助] '
 labels:
   - question
 body:
@@ -9,7 +9,7 @@ body:
     attributes:
       label: 提交前确认
       options:
-        - label: 我已阅读[issue列表](https://github.com/zhongwen-4-fraq-plugins/fraq-plugin-lexicon/issues)，但仍未找到对应的解决方法
+        - label: 我已阅读[Issue 列表](https://github.com/zhongwen-4-fraq-plugins/fraq-plugin-doudizhu/issues)，但仍未找到对应的解决方法
           required: true
   - type: textarea
     id: help-request

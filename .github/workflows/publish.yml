@@ -49,11 +49,11 @@ jobs:
       - name: 运行测试
         run: pnpm test
 
-      - name: 检查代码
-        run: pnpm check
-
       - name: 构建包
         run: pnpm build
+
+      - name: 检查代码
+        run: pnpm check
 
       - name: 发布到 npm
         run: npm publish

@@ -38,7 +38,7 @@ async function loadWorkflowRuns(repository, token, tag) {
     headers: {
       Accept: 'application/vnd.github+json',
       Authorization: `Bearer ${token}`,
-      'User-Agent': 'fraq-plugin-lexicon-release',
+      'User-Agent': 'fraq-plugin-doudizhu-release',
       'X-GitHub-Api-Version': '2022-11-28',
     },
   });

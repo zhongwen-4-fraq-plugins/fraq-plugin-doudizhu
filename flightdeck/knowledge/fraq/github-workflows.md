@@ -5,6 +5,7 @@ READ WHEN: before copying or adapting `.github` workflows and issue templates fr
 
 ---
 
-- 词库项目的 Issue 模板包含 `fraq-plugin-lexicon` 的 npm badge 和词库仓库 Issue 链接，复制到其他插件后需要按目标仓库调整。
-- `pr-review.yml` 在源文件改动时会执行 `pnpm test:mock`；目标项目没有这个脚本时，相关 PR 会失败，应先补脚本或修改工作流条件。
-- 本次按用户要求保留 `.github` 的原样副本，未擅自改写这些项目专属内容。
+- Issue 模板已改为使用 `fraq-plugin-doudizhu` 的 npm badge、项目名称和当前仓库 Issue 链接。
+- `pr-review.yml` 会在源代码、测试、牌图或构建配置变更时依次执行 `pnpm test`、`pnpm build` 和 `pnpm check`。
+- `publish.yml` 同样先构建再执行类型检查，因为本项目的 TypeScript 默认输入会读取构建生成的 `dist/index.d.mts`。
+- 发布脚本的 GitHub API User-Agent 已改为 `fraq-plugin-doudizhu-release`。
