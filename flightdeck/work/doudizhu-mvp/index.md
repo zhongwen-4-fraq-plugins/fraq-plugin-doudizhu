@@ -10,16 +10,17 @@
 - 手牌和出牌事件通过 `/image` 目录牌图横向叠放，输出 `base64://` 图片并缓存。
 - 操作超时会结束牌局、释放房间并向群发送通知；连续三轮无人叫地主后随机选地主。
 - `.github` 的 Issue 模板、发布脚本和 GitHub Actions 工作流已完成斗地主项目化适配，包含项目名称、仓库链接、npm 包名、检查命令和发布 User-Agent。
-- 已创建并推送 `v0.1.0`，并将本地包链接安装到 `D:\bot\fraq-plugins\my-fraq-app`。
-- 已在 `D:\bot\fraq-plugins\my-fraq-app` 复核 `pnpm add D:\bot\fraq-plugin-doudizhu`，依赖保持本地 junction，`dist/index.mjs` 入口存在。
-- 目标 `fraq.yml` 尚未配置 `doudizhu` 插件；目标工作区当前使用 `@fraqjs/fraq 0.17.0`，低于本插件要求的 `^1.1.0`，真实启动前需先处理兼容性。
+- 已创建并推送 `v0.1.0`；目标工作区最初使用过本地包链接，现已切换为 npm 发布包。
+- 已在 `D:\bot\fraq-plugins\my-fraq-app` 复核 npm 包解析路径位于 `node_modules/.pnpm/`，没有绑定本地源码。
+- 目标 `fraq.yml` 已配置 `doudizhu` 插件；目标工作区当前使用 `@fraqjs/fraq 0.17.0`，低于本插件要求的 `^1.1.0`，真实启动前需先处理兼容性。
 - 本地按发布工作流复现，`pnpm install --frozen-lockfile`、`pnpm test`、`pnpm build`、`pnpm check` 均通过；npm 注册表已存在 `fraq-plugin-doudizhu@0.1.0`，同版本发布会失败。
+- 已将目标工作区改为使用 npm 包 `fraq-plugin-doudizhu@0.1.0`，并在 `fraq.yml` 启用 `doudizhu`、在 `versions.yml` 锁定 `0.1.0`；未配置 `workspacePlugins`。
 
 ## Next
 
 - 用 Fraq 工作区插件连接真实协议端，验证中文路由、图片发送和群聊权限。
 - 在真实 GitHub 仓库中验证 PR 审核和 npm 发布工作流。
-- 先取得 Actions 失败步骤的日志；若失败点是 npm 版本冲突，将版本递增并创建新标签后再发布；随后在 `my-fraq-app` 中升级或确认兼容的 Fraq CLI/Fraq 核心，配置 `doudizhu: {}` 后验证群聊指令和图片发送。
+- 先取得 Actions 失败步骤的日志；若失败点是 npm 版本冲突，将版本递增并创建新标签后再发布；随后在 `my-fraq-app` 中升级或确认兼容的 Fraq CLI/Fraq 核心，再验证已启用的 `doudizhu` 群聊指令和图片发送。
 - 根据实际牌局反馈完善飞机带翅膀、机器人策略和真人 PK 扩展接口。
 
 ## Open questions
