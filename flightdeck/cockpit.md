@@ -5,7 +5,7 @@ Focus: 实现基于 Fraq 的群聊斗地主人机 MVP，并保持牌局状态、
 ## In flight
 
 - `work/fraq-foundation/`：官方 Fraq CLI 与插件知识已完成，后续实现本插件时复用。
-- `work/doudizhu-mvp/`：斗地主人机对局 MVP 已实现，等待真实 Fraq 工作区验证。
+- `work/doudizhu-mvp/`：斗地主人机对局 MVP 和项目 README 已完成，等待真实 Fraq 工作区验证。
 
 ## Next
 
