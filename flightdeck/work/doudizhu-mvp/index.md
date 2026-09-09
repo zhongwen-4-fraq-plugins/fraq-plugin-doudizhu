@@ -15,12 +15,13 @@
 - 目标 `fraq.yml` 已配置 `doudizhu` 插件；目标工作区当前使用 `@fraqjs/fraq 0.17.0`，低于本插件要求的 `^1.1.0`，真实启动前需先处理兼容性。
 - 本地按发布工作流复现，`pnpm install --frozen-lockfile`、`pnpm test`、`pnpm build`、`pnpm check` 均通过；npm 注册表已存在 `fraq-plugin-doudizhu@0.1.0`，同版本发布会失败。
 - 已将目标工作区改为使用 npm 包 `fraq-plugin-doudizhu@0.1.0`，并在 `fraq.yml` 启用 `doudizhu`、在 `versions.yml` 锁定 `0.1.0`；未配置 `workspacePlugins`。
+- 已将当前机器的全局 `@fraqjs/cli` 从 `0.9.0` 升级到 `1.0.1`；`my-fraq-app` 的本地 `@fraqjs/cli@0.7.0` 未修改。
 
 ## Next
 
 - 用 Fraq 工作区插件连接真实协议端，验证中文路由、图片发送和群聊权限。
 - 在真实 GitHub 仓库中验证 PR 审核和 npm 发布工作流。
-- 先取得 Actions 失败步骤的日志；若失败点是 npm 版本冲突，将版本递增并创建新标签后再发布；随后在 `my-fraq-app` 中升级或确认兼容的 Fraq CLI/Fraq 核心，再验证已启用的 `doudizhu` 群聊指令和图片发送。
+- 先取得 Actions 失败步骤的日志；若失败点是 npm 版本冲突，将版本递增并创建新标签后再发布；随后在 `my-fraq-app` 中升级或确认其本地 Fraq CLI/Fraq 核心兼容性，再验证已启用的 `doudizhu` 群聊指令和图片发送。
 - 根据实际牌局反馈完善飞机带翅膀、机器人策略和真人 PK 扩展接口。
 
 ## Open questions

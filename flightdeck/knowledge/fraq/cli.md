@@ -14,6 +14,7 @@ READ WHEN: before configuring, starting, updating, or debugging a Fraq applicati
 ## 安装和命令
 
 - 当前 CLI 要求 Node.js `>=22`，可用 `npm i -g @fraqjs/cli` 安装，`fraq version` 查看 CLI 版本。
+- 全局升级只影响 PATH 中的 `fraq` 命令；项目 `package.json` 中的 `@fraqjs/cli` 版本不会自动改变。分别用 `npm list -g @fraqjs/cli --depth=0` 和项目目录中的 `npm list @fraqjs/cli --depth=0` 核对两者。
 - `fraq wizard`（别名 `init`、`setup`）创建 `fraq.yml`；`fraq start`（别名 `run`）启动应用；`fraq install`（别名 `i`）只安装依赖。
 - `fraq lock` 补全插件版本并写入 `versions.yml`；`fraq outdated` 检查更新；`fraq update` 交互式更新 Fraq 和插件版本。
 - `fraq start` 默认先执行版本锁定，再生成并安装应用依赖。`--no-install` 跳过安装；`--frozen-lockfile` 跳过自动锁定；`--watch` 监听配置引用和工作区插件入口并自动重启。`--watch` 不能与前两个选项同时使用。
