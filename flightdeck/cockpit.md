@@ -9,7 +9,7 @@ Focus: 实现基于 Fraq 的群聊斗地主人机 MVP，并保持牌局状态、
 
 ## Next
 
-使用 Fraq 工作区插件验证群聊指令和图片发送，并在真实 GitHub 仓库验证已项目化的 `.github` 工作流；再根据真实对局反馈扩展牌型、AI 和真人 PK。
+使用 `my-fraq-app` 验证群聊指令和图片发送（先处理旧版 Fraq CLI 兼容性），并在真实 GitHub 仓库验证已项目化的 `.github` 工作流；再根据真实对局反馈扩展牌型、AI 和真人 PK。
 
 ## Open questions
 
