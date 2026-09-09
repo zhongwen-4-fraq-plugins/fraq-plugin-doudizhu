@@ -1,0 +1,182 @@
+name: 自动 PR 审核
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: pr-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  mock_test:
+    name: 审核改动并运行相关 mock 测试
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      mock_required: ${{ steps.changes.outputs.mock_required }}
+      mock_output_base64: ${{ steps.mock.outputs.mock_output_base64 }}
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v6
+
+      - name: 获取 PR 改动文件
+        id: changes
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              per_page: 100,
+            });
+            const filenames = files.map((file) => file.filename);
+            const mockPaths = [
+              /^src\//u,
+              /^test\/fraq-integration\.test\.ts$/u,
+              /^package\.json$/u,
+              /^pnpm-lock\.yaml$/u,
+              /^tsconfig\.json$/u,
+              /^tsdown\.config\.ts$/u,
+            ];
+            const mockRequired = filenames.some((filename) =>
+              mockPaths.some((pattern) => pattern.test(filename)),
+            );
+
+            core.setOutput('mock_required', String(mockRequired));
+
+      - name: 安装 pnpm
+        if: steps.changes.outputs.mock_required == 'true'
+        uses: pnpm/action-setup@v4
+
+      - name: 安装 Node.js
+        if: steps.changes.outputs.mock_required == 'true'
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          package-manager-cache: false
+
+      - name: 安装完整依赖
+        if: steps.changes.outputs.mock_required == 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: 运行 Fraq 官方 mock 测试
+        id: mock
+        if: steps.changes.outputs.mock_required == 'true'
+        shell: bash
+        run: |
+          set +e
+          pnpm test:mock 2>&1 | tee mock-output.log
+          TEST_STATUS=${PIPESTATUS[0]}
+
+          node --input-type=module <<'NODE'
+          import { appendFileSync, readFileSync } from 'node:fs';
+
+          const ansiPattern = /[\u001B\u009B][[\]()#;?]*(?:(?:(?:[\dA-PR-TZcf-nq-uy=><~])+\x07)|(?:(?:\d{1,4}(?:[;:]\d{0,4})*)?[\dA-PR-TZcf-nq-uy=><~]))/gu;
+          const output = readFileSync('mock-output.log', 'utf8').replace(ansiPattern, '');
+          const maxLength = 12000;
+          const truncated = output.length > maxLength
+            ? `...前面的输出已省略...\n${output.slice(-maxLength)}`
+            : output;
+          const encoded = Buffer.from(truncated, 'utf8').toString('base64');
+          appendFileSync(process.env.GITHUB_OUTPUT, `mock_output_base64=${encoded}\n`);
+          NODE
+
+          exit "$TEST_STATUS"
+
+  review-comment:
+    name: 更新审核摘要
+    needs: mock_test
+    if: >-
+      always() &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+
+    steps:
+      - name: 更新 PR 评论
+        uses: actions/github-script@v9
+        env:
+          MOCK_REQUIRED: ${{ needs.mock_test.outputs.mock_required }}
+          MOCK_OUTPUT_BASE64: ${{ needs.mock_test.outputs.mock_output_base64 }}
+          MOCK_JOB_RESULT: ${{ needs.mock_test.result }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        with:
+          script: |
+            const marker = '<!-- fraq-pr-review -->';
+            const mockRequired = process.env.MOCK_REQUIRED === 'true';
+            const jobResult = process.env.MOCK_JOB_RESULT;
+            const result = jobResult !== 'success' ? jobResult : mockRequired ? 'success' : 'skipped';
+            const passed = result === 'success' || result === 'skipped';
+            const title = passed
+              ? '# 自动审核通过，请等待人工审核/合并'
+              : '# 自动审核失败，请修复后重新提交';
+            const mockStatus = result === 'success'
+              ? '测试成功'
+              : result === 'skipped'
+                ? '未运行（本次改动无需测试）'
+                : '测试失败';
+            const mockOutput = process.env.MOCK_OUTPUT_BASE64
+              ? Buffer.from(process.env.MOCK_OUTPUT_BASE64, 'base64').toString('utf8')
+              : '';
+            const escapedMockOutput = mockOutput
+              .replaceAll('&', '&amp;')
+              .replaceAll('<', '&lt;')
+              .replaceAll('>', '&gt;');
+            const mockLog = mockRequired
+              ? escapedMockOutput || '未捕获到 Fraq mock 测试日志。'
+              : '本次改动无需运行 Fraq mock 测试。';
+            const body = [
+              marker,
+              title,
+              '',
+              '<details>',
+              '<summary>Fraq mock 测试日志</summary>',
+              '',
+              '<pre>',
+              mockLog,
+              '</pre>',
+              '</details>',
+              '',
+              '| 项目 | 内容 |',
+              '| :--: | :--: |',
+              `| Fraq mock 测试结果 | ${mockStatus} |`,
+              `| PR 提交 hash 值 | \`${process.env.HEAD_SHA.slice(0, 7)}\` |`,
+              `| 本次自动测试记录 | [点击这里查看](${process.env.RUN_URL}) |`,
+            ].join('\n');
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              per_page: 100,
+            });
+            const existing = comments.find(
+              (comment) => comment.user?.type === 'Bot' && comment.body?.includes(marker),
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }

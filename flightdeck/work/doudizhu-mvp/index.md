@@ -9,10 +9,12 @@
 - 已注册 `开始斗地主`、`明牌`、`叫地主`、`抢地主`、`不叫`、`加倍`、`超级加倍`、`不加倍`、`出牌`、`要不起`。
 - 手牌和出牌事件通过 `/image` 目录牌图横向叠放，输出 `base64://` 图片并缓存。
 - 操作超时会结束牌局、释放房间并向群发送通知；连续三轮无人叫地主后随机选地主。
+- 已从 `fraq-plugin-lexicon` 原样复制 `.github` 的 Issue 模板、发布脚本和 GitHub Actions 工作流；其中的目标项目专属引用尚未调整。
 
 ## Next
 
 - 用 Fraq 工作区插件连接真实协议端，验证中文路由、图片发送和群聊权限。
+- 核对新复制的 GitHub Actions 是否适配本项目脚本、仓库链接和 npm 包名。
 - 根据实际牌局反馈完善飞机带翅膀、机器人策略和真人 PK 扩展接口。
 
 ## Open questions
@@ -28,3 +30,4 @@
 
 - 修改 Fraq 插件生命周期、路由或发布配置时，读取 `flightdeck/knowledge/fraq/plugin.md`。
 - 修改牌面拼接尺寸、发送格式或图片缓存时，读取 `flightdeck/knowledge/doudizhu/image-layout.md`。
+- 复制或调整 `.github` 工作流和 Issue 模板时，读取 `flightdeck/knowledge/fraq/github-workflows.md`。
