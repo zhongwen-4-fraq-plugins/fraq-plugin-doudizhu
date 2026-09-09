@@ -1,22 +1,25 @@
 {
-  "name": "fraq-plugin-template <-- 在这里填写你的插件的【英文】包名",
+  "name": "fraq-plugin-doudizhu",
   "type": "module",
   "version": "0.1.0",
-  "description": "<-- 在这里编写你的插件的【中文】描述",
+  "description": "群聊斗地主人机对局插件",
   "files": [
-    "dist"
+    "dist",
+    "image"
   ],
   "main": "dist/index.mjs",
   "typings": "dist/index.d.mts",
   "scripts": {
     "build": "tsdown",
+    "test": "tsx --test test/*.test.ts",
+    "check": "tsc --noEmit",
     "prepack": "pnpm build"
   },
   "keywords": [],
-  "author": "Your Name Here <-- 在这里填写你的名字",
+  "author": "fraq-plugin-doudizhu",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/your-username/your-repo.git <-- 在这里填写你的插件的仓库地址"
+    "url": "git+https://github.com/fraqjs/fraq-plugin-doudizhu.git"
   },
   "license": "MIT",
   "packageManager": "pnpm@11.15.1",
@@ -28,10 +31,13 @@
     "tsx": "^4.23.12",
     "typescript": "^6.0.3"
   },
+  "dependencies": {
+    "sharp": "^0.34.3"
+  },
   "peerDependencies": {
     "@fraqjs/fraq": "^1.1.0"
   },
   "fraq": {
-    "category": "<-- 在这里填写你的插件的分类"
+    "category": "entertainment"
   }
 }

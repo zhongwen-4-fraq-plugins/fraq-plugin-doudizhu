@@ -1,15 +1,16 @@
 # Cockpit — fraq-plugin-doudizhu
 
-Focus: 基于 Fraq 官方文档与官方仓库主线，沉淀 CLI 使用和插件开发基础。
+Focus: 实现基于 Fraq 的群聊斗地主人机 MVP，并保持牌局状态、图片牌面和房间生命周期可恢复。
 
 ## In flight
 
 - `work/fraq-foundation/`：官方 Fraq CLI 与插件知识已完成，后续实现本插件时复用。
+- `work/doudizhu-mvp/`：斗地主人机对局 MVP 已实现，等待真实 Fraq 工作区验证。
 
 ## Next
 
-先明确斗地主插件的玩法、指令、资源和状态需求，再按 Fraq 插件契约拆分实现并使用工作区插件验证。
+使用 Fraq 工作区插件验证群聊指令和图片发送，再根据真实对局反馈扩展牌型、AI 和真人 PK。
 
 ## Open questions
 
-- 斗地主的核心玩法范围、牌图来源/授权、指令触发方式和是否需要持久化尚未确定。
+- 真人 PK 的入座、观战和房间匹配指令尚未定义。
