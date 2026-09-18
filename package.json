@@ -1,7 +1,7 @@
 {
   "name": "fraq-plugin-doudizhu",
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "群聊斗地主人机对局插件",
   "files": [
     "dist",
