@@ -9,6 +9,8 @@ export interface DoudizhuOptions {
   readonly imageDirectory?: string;
 }
 
+type HandEvent = Extract<GameEvent, { type: 'hand' }>;
+
 function positiveInteger(value: number | undefined, fallback: number): number {
   return Number.isInteger(value) && value! > 0 ? value! : fallback;
 }
@@ -58,14 +60,28 @@ export default definePlugin({
     async function replyEvents(session: Session, events: readonly GameEvent[]): Promise<void> {
       for (const event of events) {
         if (event.type === 'hand') {
-          const image = await renderer.render(event.cards);
-          await session.reply([textSegment(event.text), seg.image(image, { summary: event.text })]);
+          await sendHandPrivately(session, event);
         } else if (event.type === 'played') {
           const image = await renderer.render(event.cards);
           await session.reply([textSegment(event.text), seg.image(image, { summary: '本轮出牌' })]);
         } else {
           await session.reply(event.text);
         }
+      }
+    }
+
+    async function sendHandPrivately(session: Session, event: HandEvent): Promise<void> {
+      const userId = Number(event.playerId);
+      if (!Number.isSafeInteger(userId)) return;
+      const image = await renderer.render(event.cards);
+      try {
+        await ctx.client.send_private_message({
+          user_id: userId,
+          message: [textSegment(event.text), seg.image(image, { summary: event.text })],
+        });
+      } catch (error) {
+        ctx.logger.error('斗地主手牌私聊发送失败', error);
+        await session.reply('手牌私聊发送失败，请先加机器人为好友，再发送「开始斗地主」。');
       }
     }
 
@@ -111,13 +127,16 @@ export default definePlugin({
       }
     });
 
-    router.command('明牌').describe('查看自己的合成手牌').execute(async (session) => {
+    router.command('明牌').describe('在群内公开自己的手牌').execute(async (session) => {
       const target = requireRoom(session);
       if (!target) return;
       const player = target.room.game.snapshot.players.find((item) => item.id === String(session.raw.sender_id));
       if (!player) return;
       const image = await renderer.render(player.hand);
-      await session.reply([textSegment(`你的手牌（${player.hand.length} 张）`), seg.image(image, { summary: '斗地主手牌' })]);
+      await session.reply([
+        textSegment(`${player.name} 明牌，手牌 ${player.hand.length} 张`),
+        seg.image(image, { summary: '斗地主明牌' }),
+      ]);
     });
 
     router.command('叫地主').execute((session) => act(session, { type: 'bid', level: 3 }));

@@ -1,6 +1,6 @@
 # 斗地主人机对局 MVP
 
-状态：核心人机对局、群房间、中文指令和图片牌面已实现，等待接入真实 Fraq 运行环境验证。
+状态：核心人机对局、群房间、中文指令和图片牌面已实现；手牌已改为私聊发送、明牌改为群内公开，等待接入真实 Fraq 运行环境验证。
 
 ## Progress
 
@@ -20,10 +20,14 @@
 - 已将 `my-fraq-app` 的项目级 `@fraqjs/cli` 升级到 `1.0.1`，`fraq.yml` 的 `fraqVersion` 升级到 `1.1.0`；旧版 Windows 补丁脚本已改为兼容新 CLI。
 - 已同步刷新目标目录的 `package-lock.json` 与 `pnpm-lock.yaml`，两份锁文件均记录项目级 CLI `1.0.1`。
 - 用 `fraq start --no-install` 验证时已看到 `Applying plugin doudizhu`；随后因既有服务占用 `127.0.0.1:4649`（`EADDRINUSE`）退出，插件加载本身成功。
+- 手牌（发牌和地主拿底牌后的手牌）改为通过 `ctx.client.send_private_message` 私聊发送，群内只保留出牌结果和提示文本；私聊失败时在群里提示先加好友并写 `ctx.logger.error`。
+- `明牌` 改为在群内公开自己的手牌，消息带玩家名和手牌张数；开局提示同步改成「手牌已通过私聊发送」。
+- 新增 `test/plugin.test.ts`：用 `@fraqjs/plugin-mock` 驱动 `注册` → `开始斗地主` → `明牌`，断言手牌只走私聊、群里不出现手牌图片、明牌图片只走群聊。
 
 ## Next
 
 - 用 Fraq 工作区插件连接真实协议端，验证中文路由、图片发送和群聊权限。
+- 在真实环境验证手牌私聊：机器人需要和玩家是好友，非好友时要确认群内兜底提示是否清楚。
 - 在真实 GitHub 仓库中验证 PR 审核和 npm 发布工作流。
 - 先取得 Actions 失败步骤的日志；若失败点是 npm 版本冲突，将版本递增并创建新标签后再发布；随后处理 `my-fraq-app` 的 Hono 端口冲突，再验证已启用的 `doudizhu` 群聊指令和图片发送。
 - 根据实际牌局反馈完善飞机带翅膀、机器人策略和真人 PK 扩展接口。
@@ -37,6 +41,7 @@
 
 - `flightdeck/knowledge/fraq/plugin.md`
 - `flightdeck/knowledge/doudizhu/image-layout.md`
+- `flightdeck/knowledge/fraq/plugin-message-targets.md`
 
 ## Read if
 
@@ -45,4 +50,5 @@
 - npm 发布提示版本已存在或需要重跑 Release 工作流时，读取 `flightdeck/knowledge/fraq/npm-release-retry.md`。
 - Fraq 加载插件后因监听端口被占用而退出时，读取 `flightdeck/knowledge/fraq/runtime-port-conflict.md`。
 - 修改牌面拼接尺寸、发送格式或图片缓存时，读取 `flightdeck/knowledge/doudizhu/image-layout.md`。
+- 编写 plugin-mock 测试遇到空结果、stub client 报错或上下文已停止时，读取 `flightdeck/knowledge/fraq/plugin-mock-async.md`。
 - 复制或调整 `.github` 工作流和 Issue 模板时，读取 `flightdeck/knowledge/fraq/github-workflows.md`。

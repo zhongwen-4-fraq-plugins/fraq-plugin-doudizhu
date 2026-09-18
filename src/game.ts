@@ -129,7 +129,7 @@ export class DoudizhuGame {
 
   async begin(): Promise<GameEvent[]> {
     const events: GameEvent[] = [
-      { type: 'message', text: '斗地主房间已开始，底牌已发完。你可以发送「明牌」查看手牌。' },
+      { type: 'message', text: '斗地主房间已开始，手牌已通过私聊发送。发送「明牌」可向全群公开手牌。' },
       { type: 'hand', playerId: this.players[0].id, cards: this.players[0].hand, text: '你的手牌' },
     ];
     return this.advanceBots(events);
