@@ -19,7 +19,7 @@
   "author": "fraq-plugin-doudizhu",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/fraqjs/fraq-plugin-doudizhu.git"
+    "url": "git+https://github.com/zhongwen-4-fraq-plugins/fraq-plugin-doudizhu.git"
   },
   "license": "MIT",
   "packageManager": "pnpm@11.15.1",
