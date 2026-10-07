@@ -55,6 +55,10 @@ export function sortCards(cards: readonly Card[]): Card[] {
   return [...cards].sort((left, right) => left.value - right.value || left.id.localeCompare(right.id));
 }
 
+export function sortCardsDescending(cards: readonly Card[]): Card[] {
+  return [...cards].sort((left, right) => right.value - left.value || right.id.localeCompare(left.id));
+}
+
 export function shuffle<T>(items: readonly T[], random: () => number = Math.random): T[] {
   const result = [...items];
   for (let index = result.length - 1; index > 0; index -= 1) {

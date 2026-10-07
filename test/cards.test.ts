@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { createDeck, dealDeck, takeCardsFromHand } from '../src/cards.js';
+import { createDeck, dealDeck, sortCardsDescending, takeCardsFromHand } from '../src/cards.js';
 import { analyzePlay, canBeat } from '../src/rules.js';
 
 test('牌堆包含 54 张唯一牌，发牌数量正确', () => {
@@ -21,4 +21,12 @@ test('支持中文大小王别名和基础牌型比较', () => {
   assert.equal(rocket?.kind, 'rocket');
   assert.equal(pair?.kind, 'pair');
   assert.equal(canBeat(rocket!, pair), true);
+});
+
+test('展示手牌按牌面从高到低排列', () => {
+  const cards = createDeck().filter((card) => ['Club-3', 'Diamond-A', 'Heart-2', 'Joker-SJ', 'Joker-BJ'].includes(card.id));
+  assert.deepEqual(
+    sortCardsDescending(cards).map((card) => card.rank),
+    ['BJ', 'SJ', '2', 'A', '3'],
+  );
 });

@@ -2,7 +2,7 @@ import sharp from 'sharp';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
-import type { Card } from './cards';
+import { sortCardsDescending, type Card } from './cards';
 
 const CARD_WIDTH = 120;
 const CARD_HEIGHT = Math.round((1044 / 750) * CARD_WIDTH);
@@ -26,14 +26,15 @@ export class CardImageRenderer {
     if (cards.length === 0) {
       throw new Error('不能拼接空牌面。');
     }
-    const key = cards.map((card) => card.id).join('|');
+    const orderedCards = sortCardsDescending(cards);
+    const key = orderedCards.map((card) => card.id).join('|');
     const cached = this.cache.get(key);
     if (cached) return cached;
 
-    const width = CARD_WIDTH + (cards.length - 1) * CARD_OVERLAP + 16;
+    const width = CARD_WIDTH + (orderedCards.length - 1) * CARD_OVERLAP + 16;
     const height = CARD_HEIGHT + 16;
     const composites = await Promise.all(
-      cards.map(async (card, index) => ({
+      orderedCards.map(async (card, index) => ({
         input: await sharp(path.join(this.imageDirectory, card.imageName))
           .resize(CARD_WIDTH, CARD_HEIGHT, { fit: 'fill' })
           .png()

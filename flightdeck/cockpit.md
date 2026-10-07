@@ -1,15 +1,17 @@
 # Cockpit — fraq-plugin-doudizhu
 
-Focus: 实现基于 Fraq 的群聊斗地主人机 MVP，并保持牌局状态、图片牌面和房间生命周期可恢复。
+Focus: 把斗地主插件接到真实协议端验证群聊行为，重点是手牌只走私聊、明牌只在群里公开。
 
 ## In flight
 
 - `work/fraq-foundation/`：官方 Fraq CLI 与插件知识已完成，后续实现本插件时复用。
-- `work/doudizhu-mvp/`：斗地主人机对局 MVP 和项目 README 已完成，手牌改为私聊发送、明牌改为群内公开（含 plugin-mock 测试），等待真实 Fraq 工作区验证。
+- `work/doudizhu-mvp/`：MVP、手牌私聊/明牌公开改动、发布与安装都已完成；`0.1.1` 已上 npm 且 `my-fraq-app` 已装载，剩下接真实协议端验证。
 
 ## Next
 
-先取得 Actions 运行 `34321214614` 的失败步骤日志；本地质量检查已通过，且 npm 已存在 `0.1.0`，若为发布冲突则递增版本并创建新标签。全局和 `my-fraq-app` 项目级 Fraq CLI 均已升级到 `1.0.1`，核心版本为 `1.1.0`；插件已成功加载，下一步处理现有 Hono 端口 `4649` 冲突后验证群聊指令、手牌私聊发送和明牌公开。
+- Card image delivery now presents every hand, revealed hand, and played set from high to low; `pnpm test` and `pnpm check` pass.
+
+启动 milky（`127.0.0.1:8787`）后跑 `fraq start --no-install`，验证中文路由、群聊指令、出牌图片，以及手牌只走私聊、非好友时的群内兜底提示；随后按实际牌局反馈完善飞机带翅膀、机器人策略和真人 PK 扩展。
 
 ## Open questions
 
