@@ -6,6 +6,8 @@
 
 - Outbound hand, revealed-card, and played-card images are now sorted from high to low in `CardImageRenderer`; game state remains ascending for rule evaluation. Added a regression test for the display sort.
 - The next release version is `0.1.2`; `v0.1.1` remains the previously published tag.
+- `v0.1.2` was signed, pushed with `main`, and the target `my-fraq-app` was refreshed with a pnpm local link resolving to `0.1.2`; `dist/index.mjs` is present.
+- The target npm lockfile remains stale because npm does not support the `link:` protocol used by the pnpm local link; `pnpm-lock.yaml` is the authoritative lockfile for this install.
 
 - 已实现 54 张牌模型、洗牌发牌、基础牌型判断、机器人出牌和牌局状态机。
 - 每个群独立维护房间池，默认最多 2 个房间；每个房间固定 1 名真人和 2 名人机。

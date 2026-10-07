@@ -10,3 +10,4 @@ READ WHEN: when a locally linked plugin installs but Fraq cannot load it or its 
 - 目标工作区同时存在 `package-lock.json` 和 `pnpm-lock.yaml` 时，升级项目 CLI 后要同步刷新两份锁文件，避免后续切换包管理器时仍解析旧版本。
 - 本项目插件要求 `@fraqjs/fraq ^1.1.0`；旧版工作区即使能建立链接，也可能在启动时因 peer 版本或 CLI 生成入口不兼容而失败。
 - 验证顺序：检查 `node_modules/fraq-plugin-doudizhu` 的链接目标和 `dist/index.mjs`，再配置插件短名，最后用匹配版本的 Fraq CLI 启动验证。
+- 目标工作区使用 pnpm 本地安装后，`package.json` 会使用 `link:` 依赖并由 `pnpm-lock.yaml` 记录；此时 `npm install --package-lock-only` 会因不支持 `link:` 协议失败，不要把 npm lockfile 当成 pnpm 本地链接的安装依据。

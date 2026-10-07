@@ -11,6 +11,7 @@ Focus: 把斗地主插件接到真实协议端验证群聊行为，重点是手�
 
 - Card image delivery now presents every hand, revealed hand, and played set from high to low; `pnpm test` and `pnpm check` pass.
 - Release target is `0.1.2` / `v0.1.2`; after tagging, refresh `my-fraq-app` with the plugin via `pnpm`.
+- `v0.1.2` is pushed and `my-fraq-app` now resolves the local plugin link at `0.1.2`; the next product work remains real Milky endpoint verification.
 
 启动 milky（`127.0.0.1:8787`）后跑 `fraq start --no-install`，验证中文路由、群聊指令、出牌图片，以及手牌只走私聊、非好友时的群内兜底提示；随后按实际牌局反馈完善飞机带翅膀、机器人策略和真人 PK 扩展。
 
