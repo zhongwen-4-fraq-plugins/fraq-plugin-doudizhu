@@ -5,6 +5,7 @@
 ## Progress
 
 - Outbound hand, revealed-card, and played-card images are now sorted from high to low in `CardImageRenderer`; game state remains ascending for rule evaluation. Added a regression test for the display sort.
+- The next release version is `0.1.2`; `v0.1.1` remains the previously published tag.
 
 - 已实现 54 张牌模型、洗牌发牌、基础牌型判断、机器人出牌和牌局状态机。
 - 每个群独立维护房间池，默认最多 2 个房间；每个房间固定 1 名真人和 2 名人机。
