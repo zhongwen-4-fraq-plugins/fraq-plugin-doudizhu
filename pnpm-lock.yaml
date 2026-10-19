@@ -18,6 +18,9 @@ importers:
       '@biomejs/biome':
         specifier: ^2.5.9
         version: 2.5.9
+      '@fraqjs/plugin-kysely':
+        specifier: ^1.1.0
+        version: 1.1.0(@fraqjs/kernel@1.1.0)
       '@fraqjs/plugin-mock':
         specifier: ^1.1.0
         version: 1.1.0(@fraqjs/fraq@1.1.0)(@fraqjs/kernel@1.1.0)
@@ -259,6 +262,12 @@ packages:
   '@fraqjs/kernel@1.1.0':
     resolution: {integrity: sha512-FyNBCBsb8Zfn6nm39NlxtZwM4+uBQOrJKWlTcF4DGC/v9r8/xlTCuwo3DI6mRpuVNtNjw8P/9+SSIPLyC4tDtA==}
     engines: {node: '>=22'}
+
+  '@fraqjs/plugin-kysely@1.1.0':
+    resolution: {integrity: sha512-L0Zq4DH7pih4rnWVTyEZINBo0MDTUfrmj7rY8/mMxblJsLX9IVnPRxoY8L/gow0MzKcVcRe/AqOr9LWkhdojUg==}
+    engines: {node: '>=22.13'}
+    peerDependencies:
+      '@fraqjs/kernel': ^1.1.0
 
   '@fraqjs/plugin-mock@1.1.0':
     resolution: {integrity: sha512-DrPdYgTlxqbY+faZOIy4+Un0XH9yXPKyNCXhAE3O0g2SeWz2MiVrsN6/4RUydJV/TIz0JLKugN612VwtkEfvOg==}
@@ -715,6 +724,10 @@ packages:
     resolution: {integrity: sha512-NkJQA7oZ4YHQhd2+H3BoRFKF3d/XNsiKpHZCQEMH9pDX27hQQLsTyOocyRgaIVtf8gHX3Nt3LPkR4e5EdtPAGQ==}
     engines: {node: ^22.18.0 || >=24.0.0}
 
+  kysely@0.29.7:
+    resolution: {integrity: sha512-fmIq+7kv4WbFm2tcfznRzikqB4cuNpgZ40PSU2fAJ2/OO5XhojqnTPrmgrCjYSRJVwBln03XcRXJGnw9H099IQ==}
+    engines: {node: '>=22.0.0'}
+
   mitt@3.0.1:
     resolution: {integrity: sha512-vKivATfr97l2/QBCYAkXYDbrIWPM2IIKEl7YPhjCvKlG3kE2gm+uBo6nEXK3M5/Ffh/FLpKExzOQ3JJoJGFKBw==}
 
@@ -971,6 +984,11 @@ snapshots:
   '@fraqjs/kernel@1.1.0':
     dependencies:
       mitt: 3.0.1
+
+  '@fraqjs/plugin-kysely@1.1.0(@fraqjs/kernel@1.1.0)':
+    dependencies:
+      '@fraqjs/kernel': 1.1.0
+      kysely: 0.29.7
 
   '@fraqjs/plugin-mock@1.1.0(@fraqjs/fraq@1.1.0)(@fraqjs/kernel@1.1.0)':
     dependencies:
@@ -1256,6 +1274,8 @@ snapshots:
   hookable@6.1.1: {}
 
   import-without-cache@0.4.0: {}
+
+  kysely@0.29.7: {}
 
   mitt@3.0.1: {}
 

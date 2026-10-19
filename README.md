@@ -4,8 +4,9 @@
 
 ## 环境要求
 
-- Node.js `>=22`
+- Node.js `>=22.13`
 - Fraq `>=1.1.0`
+- `@fraqjs/plugin-kysely` `>=1.1.0`
 - 能够安装 `sharp` 原生依赖的运行环境
 
 ## 安装
@@ -13,13 +14,13 @@
 使用 pnpm 安装：
 
 ```bash
-pnpm add fraq-plugin-doudizhu
+pnpm add fraq-plugin-doudizhu @fraqjs/plugin-kysely
 ```
 
 也可以使用 npm：
 
 ```bash
-npm install fraq-plugin-doudizhu
+npm install fraq-plugin-doudizhu @fraqjs/plugin-kysely
 ```
 
 在 Fraq 项目的 `fraq.yml` 中启用插件，并按需调整配置：
@@ -29,6 +30,8 @@ configVersion: 1
 fraqVersion: 1.1.0
 
 plugins:
+  kysely:
+    sqliteUrl: file:./fraq.db
   doudizhu:
     maxRooms: 2
     turnTimeoutMs: 60000
@@ -37,6 +40,7 @@ plugins:
 如果项目使用 `versions.yml` 锁定插件版本，可以写成：
 
 ```yaml
+kysely: 1.1.0
 doudizhu: 0.1.0
 ```
 
@@ -49,6 +53,10 @@ doudizhu: 0.1.0
 | `imageDirectory` | `image/` | 可选的自定义牌图目录 |
 
 插件只处理群聊消息，指令前缀由 Fraq 的 activation 配置决定。
+
+玩家注册信息由 `@fraqjs/plugin-kysely` 持久化到 SQLite。请同时启用 `kysely` 和 `doudizhu` 插件；默认数据库文件是 Fraq 工作目录下的 `fraq.db`。
+
+数据库表会在启动时自动创建。每个 QQ 号只需注册一次，注册资格跨群共享，重复注册不会重复写入。旧版本保存在内存里的注册信息需要重新注册一次。
 
 ## 群聊指令
 
@@ -124,7 +132,7 @@ pnpm check
 
 ## 当前限制
 
-- 注册信息和房间状态保存在内存中，进程重启后会清空。
+- 房间状态保存在内存中，进程重启后会清空；玩家注册信息会保留在 SQLite 数据库中。
 - 当前仅支持一名真人和两名机器人的人机模式。
 - 暂无真人 PK、观战和跨群匹配功能。
 - 机器人使用基础策略，复杂牌局的决策能力仍在完善中。

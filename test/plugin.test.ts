@@ -1,8 +1,13 @@
-import assert from 'node:assert/strict';
-import { test } from 'node:test';
+import KyselyPlugin from '@fraqjs/plugin-kysely';
 import { createMockContext, inmsg } from '@fraqjs/plugin-mock';
 
 import DoudizhuPlugin from '../src/index.js';
+
+import assert from 'node:assert/strict';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { test } from 'node:test';
 
 const GROUP_ID = 60001;
 const USER_ID = 80001;
@@ -41,33 +46,69 @@ async function waitFor(condition: () => boolean, timeoutMs = 3_000): Promise<voi
   }
 }
 
-test('手牌走私聊发送，明牌在群内公开', async () => {
+async function withDatabaseContext(
+  databasePath: string,
+  run: (ctx: ReturnType<typeof createMockContext>) => Promise<void>,
+): Promise<void> {
   const ctx = createMockContext();
+  ctx.install(KyselyPlugin, { sqliteUrl: databasePath, autoVacuum: { enabled: false } });
   ctx.install(DoudizhuPlugin, { turnTimeoutMs: 1_000 });
   await ctx.start();
+  try {
+    await run(ctx);
+  } finally {
+    await ctx.stop();
+  }
+}
 
-  const calls = ctx.mock.apiCalls;
-  const send = (text: string) => ctx.mock.receiveGroup({ groupId: GROUP_ID, userId: USER_ID }, inmsg`${text}`);
+test('注册信息写入 Kysely 数据库并在重启后保留', async () => {
+  const directory = mkdtempSync(join(tmpdir(), 'fraq-doudizhu-'));
+  const databasePath = join(directory, 'players.sqlite');
+  try {
+    await withDatabaseContext(databasePath, async (ctx) => {
+      const calls = ctx.mock.apiCalls;
+      const send = (text: string) => ctx.mock.receiveGroup({ groupId: GROUP_ID, userId: USER_ID }, inmsg`${text}`);
 
-  await send('注册');
-  await waitFor(() => sentMessages(calls, 'send_group_message').length === 1);
+      await send('开始斗地主');
+      await waitFor(() => sentMessages(calls, 'send_group_message').length === 1);
+      assert.match(textOf(sentMessages(calls, 'send_group_message')), /请先发送“注册”/);
 
-  await send('开始斗地主');
-  await waitFor(() => sentMessages(calls, 'send_private_message').length > 0);
+      await send('注册');
+      await waitFor(() => sentMessages(calls, 'send_group_message').length === 2);
+      assert.match(textOf(sentMessages(calls, 'send_group_message')), /注册成功/);
 
-  const hands = sentMessages(calls, 'send_private_message');
-  assert.equal(hands.length, 1);
-  assert.equal(hands[0]!.user_id, USER_ID);
-  assert.equal(imageCount(hands), 1);
-  assert.match(textOf(hands), /手牌/);
-  assert.equal(imageCount(sentMessages(calls, 'send_group_message')), 0, '手牌图片不能发到群里');
+      await send('注册');
+      await waitFor(() => sentMessages(calls, 'send_group_message').length === 3);
+      assert.match(textOf(sentMessages(calls, 'send_group_message')), /已经注册过/);
 
-  calls.length = 0;
-  await send('明牌');
-  await waitFor(() => imageCount(sentMessages(calls, 'send_group_message')) === 1);
-  assert.equal(sentMessages(calls, 'send_private_message').length, 0);
-  assert.match(textOf(sentMessages(calls, 'send_group_message')), /明牌/);
+      await send('开始斗地主');
+      await waitFor(() => sentMessages(calls, 'send_private_message').length > 0);
 
-  await waitFor(() => textOf(sentMessages(calls, 'send_group_message')).includes('超时'));
-  await ctx.stop();
+      const hands = sentMessages(calls, 'send_private_message');
+      assert.equal(hands.length, 1);
+      assert.equal(hands[0]?.user_id, USER_ID);
+      assert.equal(imageCount(hands), 1);
+      assert.match(textOf(hands), /手牌/);
+      assert.equal(imageCount(sentMessages(calls, 'send_group_message')), 0, '手牌图片不能发到群里');
+
+      calls.length = 0;
+      await send('明牌');
+      await waitFor(() => imageCount(sentMessages(calls, 'send_group_message')) === 1);
+      assert.equal(sentMessages(calls, 'send_private_message').length, 0);
+      assert.match(textOf(sentMessages(calls, 'send_group_message')), /明牌/);
+
+      await waitFor(() => textOf(sentMessages(calls, 'send_group_message')).includes('超时'));
+    });
+
+    await withDatabaseContext(databasePath, async (ctx) => {
+      const calls = ctx.mock.apiCalls;
+      await ctx.mock.receiveGroup({ groupId: GROUP_ID + 1, userId: USER_ID }, inmsg`开始斗地主`);
+      await waitFor(() => sentMessages(calls, 'send_private_message').length > 0);
+      assert.equal(sentMessages(calls, 'send_private_message')[0]?.user_id, USER_ID);
+      assert.doesNotMatch(textOf(sentMessages(calls, 'send_group_message')), /请先发送“注册”/);
+      await waitFor(() => textOf(sentMessages(calls, 'send_group_message')).includes('超时'));
+    });
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
 });

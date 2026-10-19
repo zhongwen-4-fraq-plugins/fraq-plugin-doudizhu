@@ -1,7 +1,9 @@
-import { definePlugin, param, seg, type Session } from '@fraqjs/fraq';
+import { definePlugin, param, type Session, seg } from '@fraqjs/fraq';
+import { KyselyService } from '@fraqjs/plugin-kysely';
 
 import { CardImageRenderer } from './card-image.js';
-import { RoomManager, type GameAction, type GameEvent, type Room } from './game.js';
+import { type GameAction, type GameEvent, type Room, RoomManager } from './game.js';
+import { doudizhuSchema, isRegistered, registerUser } from './registration.js';
 
 export interface DoudizhuOptions {
   readonly maxRooms?: number;
@@ -12,31 +14,28 @@ export interface DoudizhuOptions {
 type HandEvent = Extract<GameEvent, { type: 'hand' }>;
 
 function positiveInteger(value: number | undefined, fallback: number): number {
-  return Number.isInteger(value) && value! > 0 ? value! : fallback;
+  return typeof value === 'number' && Number.isInteger(value) && value > 0 ? value : fallback;
 }
 
 export default definePlugin({
   name: 'doudizhu',
+  inject: { kysely: KyselyService },
   apply(ctx, options: DoudizhuOptions = {}) {
+    ctx.kysely.schemas.register(doudizhuSchema);
     const maxRooms = positiveInteger(options.maxRooms, 2);
     const turnTimeoutMs = positiveInteger(options.turnTimeoutMs, 60_000);
     const renderer = new CardImageRenderer({ imageDirectory: options.imageDirectory });
-    const registeredUsers = new Set<number>();
     const managers = new Map<number, RoomManager>();
     const roomSessions = new Map<number, Session>();
 
     function getManager(groupId: number): RoomManager {
       let manager = managers.get(groupId);
       if (manager) return manager;
-      manager = new RoomManager(
-        maxRooms,
-        { timeoutMs: turnTimeoutMs },
-        async (room) => {
-          const session = roomSessions.get(room.id);
-          roomSessions.delete(room.id);
-          if (session) await session.reply('本局因操作超时已结束，房间已释放。');
-        },
-      );
+      manager = new RoomManager(maxRooms, { timeoutMs: turnTimeoutMs }, async (room) => {
+        const session = roomSessions.get(room.id);
+        roomSessions.delete(room.id);
+        if (session) await session.reply('本局因操作超时已结束，房间已释放。');
+      });
       managers.set(groupId, manager);
       return manager;
     }
@@ -102,47 +101,74 @@ export default definePlugin({
 
     const router = ctx.router.filter((session) => session.raw.message_scene === 'group');
 
-    router.command('注册').describe('注册斗地主玩家').execute(async (session) => {
-      registeredUsers.add(session.raw.sender_id);
-      await session.reply('斗地主注册成功。发送“开始斗地主”即可开局。');
-    });
+    router
+      .command('注册')
+      .describe('注册斗地主玩家')
+      .execute(async (session) => {
+        try {
+          const registered = await registerUser(ctx.kysely, session.raw.sender_id);
+          await session.reply(
+            registered ? '斗地主注册成功。发送“开始斗地主”即可开局。' : '你已经注册过斗地主了，可以直接开始游戏。',
+          );
+        } catch (error) {
+          ctx.logger.error('斗地主玩家注册失败', error);
+          await session.reply('注册暂时失败，请稍后重试。');
+        }
+      });
 
-    router.command('开始斗地主').describe('创建一局斗地主人机对局').execute(async (session) => {
-      const userId = session.raw.sender_id;
-      if (!registeredUsers.has(userId)) {
-        await session.reply('请先发送“注册”完成斗地主注册。');
-        return;
-      }
-      const groupId = groupIdOf(session)!;
-      const manager = getManager(groupId);
-      try {
-        const senderName = session.raw.message_scene === 'group'
-          ? session.raw.group_member.card || session.raw.group_member.nickname
-          : String(userId);
-        const room = manager.create(String(userId), senderName);
-        roomSessions.set(room.id, session);
-        await replyEvents(session, await room.game.begin());
-      } catch (error) {
-        await session.reply(error instanceof Error ? error.message : '创建房间失败，请稍后再试。');
-      }
-    });
+    router
+      .command('开始斗地主')
+      .describe('创建一局斗地主人机对局')
+      .execute(async (session) => {
+        const userId = session.raw.sender_id;
+        try {
+          if (!(await isRegistered(ctx.kysely, userId))) {
+            await session.reply('请先发送“注册”完成斗地主注册。');
+            return;
+          }
+        } catch (error) {
+          ctx.logger.error('斗地主玩家注册状态查询失败', error);
+          await session.reply('暂时无法读取注册状态，请稍后重试。');
+          return;
+        }
+        const groupId = groupIdOf(session);
+        if (groupId === undefined) return;
+        const manager = getManager(groupId);
+        try {
+          const senderName =
+            session.raw.message_scene === 'group'
+              ? session.raw.group_member.card || session.raw.group_member.nickname
+              : String(userId);
+          const room = manager.create(String(userId), senderName);
+          roomSessions.set(room.id, session);
+          await replyEvents(session, await room.game.begin());
+        } catch (error) {
+          await session.reply(error instanceof Error ? error.message : '创建房间失败，请稍后再试。');
+        }
+      });
 
-    router.command('明牌').describe('在群内公开自己的手牌').execute(async (session) => {
-      const target = requireRoom(session);
-      if (!target) return;
-      const player = target.room.game.snapshot.players.find((item) => item.id === String(session.raw.sender_id));
-      if (!player) return;
-      const image = await renderer.render(player.hand);
-      await session.reply([
-        textSegment(`${player.name} 明牌，手牌 ${player.hand.length} 张`),
-        seg.image(image, { summary: '斗地主明牌' }),
-      ]);
-    });
+    router
+      .command('明牌')
+      .describe('在群内公开自己的手牌')
+      .execute(async (session) => {
+        const target = requireRoom(session);
+        if (!target) return;
+        const player = target.room.game.snapshot.players.find((item) => item.id === String(session.raw.sender_id));
+        if (!player) return;
+        const image = await renderer.render(player.hand);
+        await session.reply([
+          textSegment(`${player.name} 明牌，手牌 ${player.hand.length} 张`),
+          seg.image(image, { summary: '斗地主明牌' }),
+        ]);
+      });
 
     router.command('叫地主').execute((session) => act(session, { type: 'bid', level: 3 }));
     router
       .command('叫地主')
-      .arg('level', param.num().refine((value): value is 0 | 1 | 2 | 3 => value >= 0 && value <= 3 && Number.isInteger(value)))
+      .arg(
+        'level',
+        param.num().refine((value): value is 0 | 1 | 2 | 3 => value >= 0 && value <= 3 && Number.isInteger(value)),
+      )
       .execute((session, { level }) => act(session, { type: 'bid', level }));
     router.command('抢地主').execute((session) => {
       const target = requireRoom(session);

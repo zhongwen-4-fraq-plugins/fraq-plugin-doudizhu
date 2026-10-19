@@ -23,8 +23,12 @@
   },
   "license": "MIT",
   "packageManager": "pnpm@11.15.1",
+  "engines": {
+    "node": ">=22.13"
+  },
   "devDependencies": {
     "@biomejs/biome": "^2.5.9",
+    "@fraqjs/plugin-kysely": "^1.1.0",
     "@fraqjs/plugin-mock": "^1.1.0",
     "@types/node": "^24.13.3",
     "tsdown": "^0.22.14",
@@ -35,7 +39,8 @@
     "sharp": "^0.34.3"
   },
   "peerDependencies": {
-    "@fraqjs/fraq": "^1.1.0"
+    "@fraqjs/fraq": "^1.1.0",
+    "@fraqjs/plugin-kysely": "^1.1.0"
   },
   "fraq": {
     "category": "entertainment"
