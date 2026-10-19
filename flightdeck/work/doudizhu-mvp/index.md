@@ -1,6 +1,6 @@
 # 斗地主人机对局 MVP
 
-状态：核心人机对局、群房间、中文指令和图片牌面已实现；手牌已改为私聊发送、明牌改为群内公开。`0.1.1` 已发布到 npm 并生成 Release，目标工作区已升级到 `0.1.1` 且能正常加载插件；剩下的是接上真实协议端验证群聊行为。
+状态：核心人机对局、群房间、中文指令和图片牌面已实现；手牌已改为私聊发送、明牌改为群内公开。已按 GamePick 经典规则补齐牌型解析、四带二和机器人组合牌生成，测试与类型检查通过；真实协议端验证仍待执行。
 
 ## Progress
 
@@ -26,12 +26,15 @@
 - 目标工作区已升级：`package.json` 与 `versions.yml` 的斗地主插件改为 `0.1.1`，`pnpm install` 与 `npm install --package-lock-only --legacy-peer-deps` 均已刷新，`node_modules` 解析到 `0.1.1`。
 - `fraq start --no-install` 冒烟测试通过：日志出现 `Applying plugin doudizhu`，Hono 正常监听 `127.0.0.1:4649`（端口冲突已消失），只有 milky 的 `127.0.0.1:8787` WebSocket 连不上（协议端没在跑）。
 - 冒烟测试进程已全部关闭，4649 端口测试结束后恢复空闲。
+- 已按用户指定的 GamePick 经典规则收紧顺子、连对和飞机边界；新增四带两张单牌、四带两对，并让机器人生成三带、飞机和四带组合牌。
+- `analyzePlay` 现在接收上一手牌以便在飞机带牌存在歧义时匹配相同牌型与长度；牌局调用已传入 `previousPlay`。
 
 ## Next
 
 - 启动真实协议端（milky `127.0.0.1:8787`）后验证：中文路由、群聊指令、出牌图片、以及手牌只走私聊。
 - 在真实环境验证私聊：机器人需要和玩家是好友，非好友时确认群内兜底提示是否清楚。
 - 根据实际牌局反馈完善飞机带翅膀、机器人策略和真人 PK 扩展接口。
+- 继续用真实牌局验证四带二与飞机带翅膀的用户输入体验，必要时再明确不同地区规则差异。
 - 下一个版本发布前，先核对 `package.json` 的 `repository` / `homepage` 是否仍指向本仓库。
 
 ## Open questions
@@ -43,6 +46,7 @@
 - `flightdeck/knowledge/fraq/plugin.md`
 - `flightdeck/knowledge/fraq/plugin-message-targets.md`
 - `flightdeck/knowledge/doudizhu/image-layout.md`
+- `flightdeck/knowledge/doudizhu/classic-rules.md`
 
 ## Read if
 

@@ -248,7 +248,7 @@ export class DoudizhuGame {
   private applyPlay(playerIndex: number, input: string, events: GameEvent[]): void {
     const player = this.players[playerIndex]!;
     const cards = takeCardsFromHand(player.hand, input);
-    const play = analyzePlay(cards);
+    const play = analyzePlay(cards, this.previousPlay);
     if (!play) throw new Error('这组牌不符合斗地主牌型。');
     if (!canBeat(play, this.previousPlay)) throw new Error('这组牌压不过上一手牌。');
     const playedIds = new Set(cards.map((card) => card.id));
