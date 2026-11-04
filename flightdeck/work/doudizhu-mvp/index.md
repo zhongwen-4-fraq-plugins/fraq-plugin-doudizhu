@@ -5,10 +5,11 @@
 ## Progress
 
 - Outbound hand, revealed-card, and played-card images are now sorted from high to low in `CardImageRenderer`; game state remains ascending for rule evaluation. Added a regression test for the display sort.
-- The next release version is `0.1.3`; `v0.1.2` remains the previously published tag.
+- Release candidate `0.1.3` is prepared; `v0.1.2` is still the latest published tag until the `v0.1.3` workflow runs.
 - `v0.1.2` was signed, pushed with `main`, and the target `my-fraq-app` was refreshed with a pnpm local link resolving to `0.1.2`; `dist/index.mjs` is present.
 - The target npm lockfile remains stale because npm does not support the `link:` protocol used by the pnpm local link; `pnpm-lock.yaml` is the authoritative lockfile for this install.
-- `0.1.3` includes the committed `退出游戏` command in `69f1e20`; package version, tests, type check, and build are ready for the signed release commit and `v0.1.3` tag.
+- `0.1.3` includes the committed `退出游戏` command in `69f1e20`; signed release commit `aaff6e4` and signed tag `v0.1.3` exist locally, but push failed because `github.com:443` is unreachable.
+- `my-fraq-app` was refreshed with `pnpm add D:\bot\fraq-plugin-doudizhu`; its link resolves to this repository at package version `0.1.3`, with `dist/index.mjs` present.
 
 - 已实现 54 张牌模型、洗牌发牌、基础牌型判断、机器人出牌和牌局状态机。
 - 每个群独立维护房间池，默认最多 2 个房间；每个房间固定 1 名真人和 2 名人机。
@@ -40,7 +41,7 @@
 - 真实环境启动前确认 `fraq.yml` 同时启用 `kysely` 与 `doudizhu`，并确认 `sqliteUrl` 指向持久化位置。
 - 继续用真实牌局验证四带二与飞机带翅膀的用户输入体验，必要时再明确不同地区规则差异。
 - 下一个版本发布前，先核对 `package.json` 的 `repository` / `homepage` 是否仍指向本仓库。
-- `v0.1.3` 推送后，等待发布工作流并确认 `npm view fraq-plugin-doudizhu@0.1.3 version`，再在 `my-fraq-app` 运行 `pnpm add D:\bot\fraq-plugin-doudizhu` 刷新本地链接。
+- 网络恢复后执行 `git push origin main refs/tags/v0.1.3`；随后等待发布工作流并确认 `npm view fraq-plugin-doudizhu@0.1.3 version`。
 
 ## Open questions
 
