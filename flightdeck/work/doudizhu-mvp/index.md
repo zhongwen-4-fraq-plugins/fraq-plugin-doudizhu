@@ -10,6 +10,7 @@
 - The target npm lockfile remains stale because npm does not support the `link:` protocol used by the pnpm local link; `pnpm-lock.yaml` is the authoritative lockfile for this install.
 - `0.1.3` includes the committed `退出游戏` command in `69f1e20`; signed release commit `aaff6e4` and signed tag `v0.1.3` are pushed, the GitHub publish workflow succeeded, and npm reports version/latest `0.1.3` with `slsa.dev/provenance/v1`.
 - `my-fraq-app` was refreshed with `pnpm add D:\bot\fraq-plugin-doudizhu`; its link resolves to this repository at package version `0.1.3`, with `dist/index.mjs` present.
+- 现场排查发现 `my-fraq-app/app/package.json` 与 `app/node_modules/fraq-plugin-doudizhu` 仍为 `0.1.1`，实际运行入口不含 `退出游戏`；外层 pnpm 链接为 `0.1.3` 不会自动刷新生成应用。`fraq.yml` 设置 `/` prefix，调用需为 `/退出游戏`，并且玩家要在当前群有活动房间。
 
 - 已实现 54 张牌模型、洗牌发牌、基础牌型判断、机器人出牌和牌局状态机。
 - 每个群独立维护房间池，默认最多 2 个房间；每个房间固定 1 名真人和 2 名人机。
@@ -39,6 +40,7 @@
 - 在真实环境验证私聊：机器人需要和玩家是好友，非好友时确认群内兜底提示是否清楚。
 - 根据实际牌局反馈完善飞机带翅膀、机器人策略和真人 PK 扩展接口。
 - 真实环境启动前确认 `fraq.yml` 同时启用 `kysely` 与 `doudizhu`，并确认 `sqliteUrl` 指向持久化位置。
+- 在 `my-fraq-app` 更新 `versions.yml` 中 `doudizhu` 至 `0.1.3`，运行 `fraq start` 重新安装生成应用依赖并重启现有进程；然后在有活动牌局的群内发送 `/退出游戏`。
 - 继续用真实牌局验证四带二与飞机带翅膀的用户输入体验，必要时再明确不同地区规则差异。
 - 下一个版本发布前，先核对 `package.json` 的 `repository` / `homepage` 是否仍指向本仓库。
 - 真实协议端仍待启动验证；发布 `0.1.3` 已完成。
