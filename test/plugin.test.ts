@@ -49,10 +49,11 @@ async function waitFor(condition: () => boolean, timeoutMs = 3_000): Promise<voi
 async function withDatabaseContext(
   databasePath: string,
   run: (ctx: ReturnType<typeof createMockContext>) => Promise<void>,
+  turnTimeoutMs = 1_000,
 ): Promise<void> {
   const ctx = createMockContext();
   ctx.install(KyselyPlugin, { sqliteUrl: databasePath, autoVacuum: { enabled: false } });
-  ctx.install(DoudizhuPlugin, { turnTimeoutMs: 1_000 });
+  ctx.install(DoudizhuPlugin, { turnTimeoutMs });
   await ctx.start();
   try {
     await run(ctx);
@@ -108,6 +109,38 @@ test('注册信息写入 Kysely 数据库并在重启后保留', async () => {
       assert.doesNotMatch(textOf(sentMessages(calls, 'send_group_message')), /请先发送“注册”/);
       await waitFor(() => textOf(sentMessages(calls, 'send_group_message')).includes('超时'));
     });
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test('退出游戏会释放房间，玩家可以重新开局', async () => {
+  const directory = mkdtempSync(join(tmpdir(), 'fraq-doudizhu-'));
+  const databasePath = join(directory, 'players.sqlite');
+  try {
+    await withDatabaseContext(
+      databasePath,
+      async (ctx) => {
+        const calls = ctx.mock.apiCalls;
+        const send = (text: string) => ctx.mock.receiveGroup({ groupId: GROUP_ID, userId: USER_ID }, inmsg`${text}`);
+
+        await send('注册');
+        await waitFor(() => sentMessages(calls, 'send_group_message').length === 1);
+        await send('开始斗地主');
+        await waitFor(() => sentMessages(calls, 'send_private_message').length === 1);
+
+        await send('退出游戏');
+        await waitFor(() => textOf(sentMessages(calls, 'send_group_message')).includes('你已退出本局'));
+
+        await send('开始斗地主');
+        await waitFor(() => sentMessages(calls, 'send_private_message').length === 2);
+        assert.equal(imageCount(sentMessages(calls, 'send_private_message')), 2);
+
+        await send('退出游戏');
+        await waitFor(() => textOf(sentMessages(calls, 'send_group_message')).split('你已退出本局').length === 3);
+      },
+      10_000,
+    );
   } finally {
     rmSync(directory, { recursive: true, force: true });
   }

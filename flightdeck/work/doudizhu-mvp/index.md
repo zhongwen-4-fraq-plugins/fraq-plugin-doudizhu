@@ -29,6 +29,7 @@
 - 已按用户指定的 GamePick 经典规则收紧顺子、连对和飞机边界；新增四带两张单牌、四带两对，并让机器人生成三带、飞机和四带组合牌。
 - `analyzePlay` 现在接收上一手牌以便在飞机带牌存在歧义时匹配相同牌型与长度；牌局调用已传入 `previousPlay`。
 - 玩家注册已改用 `@fraqjs/plugin-kysely` 的 SQLite 服务；`doudizhu` migration 创建注册表，重复注册幂等，重启上下文后仍能识别已注册用户。
+- 新增群聊指令 `退出游戏`：移除当前玩家的房间、清理计时器与会话引用，并允许立即重新开局；插件集成测试覆盖退出后重开。
 
 ## Next
 
@@ -50,6 +51,7 @@
 - `flightdeck/knowledge/doudizhu/image-layout.md`
 - `flightdeck/knowledge/doudizhu/classic-rules.md`
 - `flightdeck/knowledge/fraq/kysely-persistence.md`
+- `flightdeck/knowledge/doudizhu/room-lifecycle.md`
 
 ## Read if
 

@@ -148,6 +148,17 @@ export default definePlugin({
       });
 
     router
+      .command('退出游戏')
+      .describe('退出当前斗地主对局并释放房间')
+      .execute(async (session) => {
+        const target = requireRoom(session);
+        if (!target) return;
+        target.manager.remove(target.room.id);
+        roomSessions.delete(target.room.id);
+        await session.reply('你已退出本局，房间已释放。发送“开始斗地主”可重新开局。');
+      });
+
+    router
       .command('明牌')
       .describe('在群内公开自己的手牌')
       .execute(async (session) => {
