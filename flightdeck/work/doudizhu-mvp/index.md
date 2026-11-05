@@ -6,6 +6,7 @@
 
 - Outbound hand, revealed-card, and played-card images are now sorted from high to low in `CardImageRenderer`; game state remains ascending for rule evaluation. Added a regression test for the display sort.
 - Release `0.1.3` is published; `v0.1.3` is the latest successful release tag.
+- Release `0.1.4` includes the renamed `结束游戏` command and the ordered post-deal group guide with a real mention; tests, type check, and build pass before publishing.
 - `v0.1.2` was signed, pushed with `main`, and the target `my-fraq-app` was refreshed with a pnpm local link resolving to `0.1.2`; `dist/index.mjs` is present.
 - The target npm lockfile remains stale because npm does not support the `link:` protocol used by the pnpm local link; `pnpm-lock.yaml` is the authoritative lockfile for this install.
 - `0.1.3` introduced the former `退出游戏` command in `69f1e20`; it has now been renamed to `结束游戏` in the working tree, and the old name is not retained as an alias.
@@ -38,11 +39,11 @@
 ## Next
 
 - 启动真实协议端（milky `127.0.0.1:8787`）后验证：中文路由、群聊指令、出牌图片、以及手牌只走私聊。
-- 下一发布版本应包含新的开局引导；`0.1.3` 已发布版本仍是旧文案。
+- `my-fraq-app` currently resolves `0.1.3`; after the `v0.1.4` workflow succeeds, set `versions.yml` to `doudizhu: 0.1.4`, run `fraq install`, verify `app/package.json` and the resolved plugin entry, then restart before testing.
 - 在真实环境验证私聊：机器人需要和玩家是好友，非好友时确认群内兜底提示是否清楚。
 - 根据实际牌局反馈完善飞机带翅膀、机器人策略和真人 PK 扩展接口。
 - 真实环境启动前确认 `fraq.yml` 同时启用 `kysely` 与 `doudizhu`，并确认 `sqliteUrl` 指向持久化位置。
-- 发布包含命令改名的版本后，在 `my-fraq-app` 同步 `versions.yml`，运行 `fraq start` 刷新生成应用依赖并重启进程；然后在有活动牌局的群内发送 `/结束游戏`。
+- 在有活动牌局的群内验证 `/结束游戏`；该命令改名包含在待发布的 `0.1.4` 中。
 - 继续用真实牌局验证四带二与飞机带翅膀的用户输入体验，必要时再明确不同地区规则差异。
 - 下一个版本发布前，先核对 `package.json` 的 `repository` / `homepage` 是否仍指向本仓库。
 - 真实协议端仍待启动验证；发布 `0.1.3` 已完成。

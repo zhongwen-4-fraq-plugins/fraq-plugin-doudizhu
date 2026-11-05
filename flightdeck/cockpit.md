@@ -10,8 +10,7 @@ Focus: 把斗地主插件接到真实协议端验证群聊行为，重点是手�
 ## Next
 
 - Release `0.1.3` is complete: `main` and signed tag `v0.1.3` are pushed, the GitHub publish workflow succeeded, npm `latest` is `0.1.3` with provenance, and `my-fraq-app` resolves the pnpm local link at `0.1.3`.
-- 发布命令改名后的版本，在 `my-fraq-app` 同步 `versions.yml` 并重启生成应用，再于活动牌局中验证 `/结束游戏`。
-- 发布新版后验证发牌私聊先发送，再出现「对局开始」两行群提示以及对操作玩家的真实 @。
+- Release `0.1.4` packages the `结束游戏` command and the new post-deal, @-player bidding guide; after publish, update `my-fraq-app` to `0.1.4` and verify `/结束游戏` plus the ordered group prompt.
 - 启动 milky（`127.0.0.1:8787`）后跑 `fraq start --no-install`，验证中文路由、群聊指令（包括 `结束游戏`）、出牌图片，以及手牌只走私聊、非好友时的群内兜底提示。
 - 按真实牌局反馈完善飞机带翅膀、机器人策略和真人 PK 扩展。
 
