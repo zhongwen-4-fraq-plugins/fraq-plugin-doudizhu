@@ -114,7 +114,7 @@ test('注册信息写入 Kysely 数据库并在重启后保留', async () => {
   }
 });
 
-test('退出游戏会释放房间，玩家可以重新开局', async () => {
+test('结束游戏会释放房间，玩家可以重新开局', async () => {
   const directory = mkdtempSync(join(tmpdir(), 'fraq-doudizhu-'));
   const databasePath = join(directory, 'players.sqlite');
   try {
@@ -129,14 +129,14 @@ test('退出游戏会释放房间，玩家可以重新开局', async () => {
         await send('开始斗地主');
         await waitFor(() => sentMessages(calls, 'send_private_message').length === 1);
 
-        await send('退出游戏');
+        await send('结束游戏');
         await waitFor(() => textOf(sentMessages(calls, 'send_group_message')).includes('你已退出本局'));
 
         await send('开始斗地主');
         await waitFor(() => sentMessages(calls, 'send_private_message').length === 2);
         assert.equal(imageCount(sentMessages(calls, 'send_private_message')), 2);
 
-        await send('退出游戏');
+        await send('结束游戏');
         await waitFor(() => textOf(sentMessages(calls, 'send_group_message')).split('你已退出本局').length === 3);
       },
       10_000,

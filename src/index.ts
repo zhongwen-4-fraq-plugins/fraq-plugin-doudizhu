@@ -148,7 +148,7 @@ export default definePlugin({
       });
 
     router
-      .command('退出游戏')
+      .command('结束游戏')
       .describe('退出当前斗地主对局并释放房间')
       .execute(async (session) => {
         const target = requireRoom(session);
