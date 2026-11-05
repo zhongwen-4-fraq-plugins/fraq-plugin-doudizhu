@@ -5,12 +5,12 @@
 ## Progress
 
 - Outbound hand, revealed-card, and played-card images are now sorted from high to low in `CardImageRenderer`; game state remains ascending for rule evaluation. Added a regression test for the display sort.
-- Release `0.1.3` is published; `v0.1.3` is the latest successful release tag.
-- Release `0.1.4` includes the renamed `结束游戏` command and the ordered post-deal group guide with a real mention; tests, type check, and build pass before publishing.
+- Release `0.1.3` was the prior release; `v0.1.4` is now published and latest, including `结束游戏` and the ordered post-deal prompt with a real mention. GitHub workflow passed, npm `latest` is `0.1.4` with provenance, and `v0.1.4` is signed.
+- Tests, type check, and build passed before publishing `0.1.4`.
 - `v0.1.2` was signed, pushed with `main`, and the target `my-fraq-app` was refreshed with a pnpm local link resolving to `0.1.2`; `dist/index.mjs` is present.
 - The target npm lockfile remains stale because npm does not support the `link:` protocol used by the pnpm local link; `pnpm-lock.yaml` is the authoritative lockfile for this install.
 - `0.1.3` introduced the former `退出游戏` command in `69f1e20`; it has now been renamed to `结束游戏` in the working tree, and the old name is not retained as an alias.
-- `my-fraq-app` was refreshed with `pnpm add D:\bot\fraq-plugin-doudizhu`; its link resolves to this repository at package version `0.1.3`, with `dist/index.mjs` present.
+- `my-fraq-app` outer pnpm link resolves to the local repository; `versions.yml` and generated `app/package.json` now pin `0.1.4`, and `app/node_modules/fraq-plugin-doudizhu` resolves the npm `0.1.4` package with `dist/index.mjs` present.
 - 现场排查发现 `my-fraq-app/app/package.json` 与 `app/node_modules/fraq-plugin-doudizhu` 曾锁在 `0.1.1`，实际运行入口不含新命令；外层 pnpm 链接不会自动刷新生成应用。`fraq.yml` 设置 `/` prefix，调用需为 `/结束游戏`，并且玩家要在当前群有活动房间。
 
 - 已实现 54 张牌模型、洗牌发牌、基础牌型判断、机器人出牌和牌局状态机。
@@ -38,15 +38,15 @@
 
 ## Next
 
-- 启动真实协议端（milky `127.0.0.1:8787`）后验证：中文路由、群聊指令、出牌图片、以及手牌只走私聊。
-- `my-fraq-app` currently resolves `0.1.3`; after the `v0.1.4` workflow succeeds, set `versions.yml` to `doudizhu: 0.1.4`, run `fraq install`, verify `app/package.json` and the resolved plugin entry, then restart before testing.
+- 在已连接的 Milky 真实群聊中验证中文路由、群聊指令、出牌图片及手牌私聊。
+- The `0.1.4` runtime was smoke-started through Fraq, loaded `doudizhu`, and connected its Milky WebSocket; the temporary process was stopped cleanly. Still verify `/结束游戏` and the prompt in a real group game.
 - 在真实环境验证私聊：机器人需要和玩家是好友，非好友时确认群内兜底提示是否清楚。
 - 根据实际牌局反馈完善飞机带翅膀、机器人策略和真人 PK 扩展接口。
 - 真实环境启动前确认 `fraq.yml` 同时启用 `kysely` 与 `doudizhu`，并确认 `sqliteUrl` 指向持久化位置。
-- 在有活动牌局的群内验证 `/结束游戏`；该命令改名包含在待发布的 `0.1.4` 中。
+- `fraq install` alone does not regenerate the CLI's `app/package.json`; `fraq start` synced the version lock, regenerated the app, installed `0.1.4`, and completed the runtime smoke check.
 - 继续用真实牌局验证四带二与飞机带翅膀的用户输入体验，必要时再明确不同地区规则差异。
 - 下一个版本发布前，先核对 `package.json` 的 `repository` / `homepage` 是否仍指向本仓库。
-- 真实协议端仍待启动验证；发布 `0.1.3` 已完成。
+- `0.1.4` 发布与启动冒烟已完成；真实群聊中的实际牌局流程仍待验证。
 
 ## Open questions
 
