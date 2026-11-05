@@ -15,7 +15,7 @@ const USER_ID = 80001;
 interface SentMessage {
   user_id?: number;
   group_id?: number;
-  message: { type: string; data?: { text?: string } }[];
+  message: { type: string; data?: { text?: string; user_id?: number } }[];
 }
 
 interface ApiCall {
@@ -82,15 +82,27 @@ test('注册信息写入 Kysely 数据库并在重启后保留', async () => {
       await waitFor(() => sentMessages(calls, 'send_group_message').length === 3);
       assert.match(textOf(sentMessages(calls, 'send_group_message')), /已经注册过/);
 
+      calls.length = 0;
       await send('开始斗地主');
-      await waitFor(() => sentMessages(calls, 'send_private_message').length > 0);
+      await waitFor(
+        () => sentMessages(calls, 'send_private_message').length > 0 && textOf(sentMessages(calls, 'send_group_message')).includes('开始叫地主环节'),
+      );
 
       const hands = sentMessages(calls, 'send_private_message');
+      const groupMessages = sentMessages(calls, 'send_group_message');
       assert.equal(hands.length, 1);
       assert.equal(hands[0]?.user_id, USER_ID);
       assert.equal(imageCount(hands), 1);
       assert.match(textOf(hands), /手牌/);
       assert.equal(imageCount(sentMessages(calls, 'send_group_message')), 0, '手牌图片不能发到群里');
+      assert.equal(calls.findIndex((call) => call.endpoint === 'send_private_message') < calls.findIndex((call) => call.endpoint === 'send_group_message'), true);
+      assert.equal(groupMessages[0]?.message[0]?.data?.text, '对局开始，手牌已发送，发送 [明牌] 可公开手牌\n开始叫地主环节，');
+      assert.deepEqual(
+        groupMessages[0]?.message.find((segment) => segment.type === 'mention')?.data,
+        { user_id: USER_ID },
+      );
+      assert.equal(groupMessages[0]?.message[2]?.data?.text, ' 你可以发送 [叫地主/不叫] 进行操作');
+      assert.doesNotMatch(textOf(groupMessages), /轮到你操作/);
 
       calls.length = 0;
       await send('明牌');

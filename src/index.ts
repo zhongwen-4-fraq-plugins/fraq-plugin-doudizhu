@@ -63,6 +63,13 @@ export default definePlugin({
         } else if (event.type === 'played') {
           const image = await renderer.render(event.cards);
           await session.reply([textSegment(event.text), seg.image(image, { summary: '本轮出牌' })]);
+        } else if (event.type === 'message' && event.mentionPlayerId !== undefined) {
+          const userId = Number(event.mentionPlayerId);
+          if (Number.isSafeInteger(userId)) {
+            await session.reply([textSegment(event.text), seg.mention(userId), textSegment(event.textAfterMention ?? '')]);
+          } else {
+            await session.reply(`${event.text}${event.textAfterMention ?? ''}`);
+          }
         } else {
           await session.reply(event.text);
         }

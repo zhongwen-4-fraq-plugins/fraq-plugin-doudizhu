@@ -34,7 +34,7 @@ export type GameAction =
   | { type: 'pass' };
 
 export type GameEvent =
-  | { type: 'message'; text: string }
+  | { type: 'message'; text: string; mentionPlayerId?: string; textAfterMention?: string }
   | { type: 'hand'; playerId: string; cards: Card[]; text: string }
   | { type: 'played'; playerId: string; cards: Card[]; text: string }
   | { type: 'turn'; playerId: string; text: string }
@@ -129,10 +129,15 @@ export class DoudizhuGame {
 
   async begin(): Promise<GameEvent[]> {
     const events: GameEvent[] = [
-      { type: 'message', text: '斗地主房间已开始，手牌已通过私聊发送。发送「明牌」可向全群公开手牌。' },
       { type: 'hand', playerId: this.players[0].id, cards: this.players[0].hand, text: '你的手牌' },
+      {
+        type: 'message',
+        text: '对局开始，手牌已发送，发送 [明牌] 可公开手牌\n开始叫地主环节，',
+        mentionPlayerId: this.players[0].id,
+        textAfterMention: ' 你可以发送 [叫地主/不叫] 进行操作',
+      },
     ];
-    return this.advanceBots(events);
+    return this.advanceBots(events, false);
   }
 
   async act(playerId: string, action: GameAction): Promise<GameEvent[]> {
@@ -266,7 +271,7 @@ export class DoudizhuGame {
     this.currentPlayer = nextPlayer(playerIndex);
   }
 
-  private async advanceBots(events: GameEvent[]): Promise<GameEvent[]> {
+  private async advanceBots(events: GameEvent[], includeTurnPrompt = true): Promise<GameEvent[]> {
     while (this.phase !== 'finished' && this.players[this.currentPlayer]!.kind === 'bot') {
       const playerIndex = this.currentPlayer;
       const player = this.players[playerIndex]!;
@@ -285,7 +290,7 @@ export class DoudizhuGame {
       }
       this.resetTimeout();
     }
-    if (this.phase !== 'finished') {
+    if (includeTurnPrompt && this.phase !== 'finished') {
       events.push({ type: 'turn', playerId: this.players[this.currentPlayer]!.id, text: `轮到${playerLabel(this.players[this.currentPlayer])}操作。` });
     }
     return events;

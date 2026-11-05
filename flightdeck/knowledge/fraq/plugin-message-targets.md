@@ -10,3 +10,4 @@ READ WHEN: before sending a message to a peer other than the current session, fo
 - 群内插件给群成员私聊时，用 `Number(...)` 把字符串 QQ 号转成数字；发送失败要在群里回一条提醒（推荐让用户先加机器人好友），并用 `ctx.logger.error` 记录原因，否则玩家看不到手牌也不知道为什么。
 - 斗地主的手牌就是这样发的：`hand` 事件走私聊，出牌事件和 `明牌` 走群聊。
 - `seg.image(uri, { summary })` 配合 `base64://` URI 可直接用于这两个接口，无需先上传。
+- 群消息需要真实 @ 某位玩家时，将 `seg.mention(Number(userId))` 与文本段组合成消息段数组；测试应检查 `type: 'mention'` 和 `data.user_id`，不要只断言扁平化后的文本。
